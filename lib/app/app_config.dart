@@ -1,13 +1,10 @@
-/// Single source of truth for the backend location. When switching between
-/// the Android emulator (10.0.2.2) and a physical device (your machine's
-/// LAN IP), this is the only place that needs to change.
+/// Single source of truth for the backend location. This is the only place
+/// that needs to change when switching between local dev (emulator alias or
+/// LAN IP) and the live Vercel deployment.
 class AppConfig {
   AppConfig._();
 
-  static const String apiHost = '192.168.0.85';
-  static const int apiPort = 5000;
-
-  static const String baseUrl = 'http://$apiHost:$apiPort';
+  static const String baseUrl = 'https://zendora-backend.vercel.app';
   static const String apiBaseUrl = '$baseUrl/api';
 
   /// The backend returns media (avatars, etc.) as host-relative paths like

@@ -1,0 +1,45 @@
+name: iOS Build (unsigned)
+
+# Produces an unsigned .ipa for manual sideloading/testing (e.g. via AltStore).
+# Not signed for distribution — Apple requires a paid Developer Program
+# membership for that (TestFlight or ad-hoc). This just verifies the iOS
+# build succeeds and gives you an installable artifact for your own device.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/**'
+      - 'ios/**'
+      - 'pubspec.yaml'
+      - '.github/workflows/ios-build.yml'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - run: flutter build ios --release --no-codesign
+
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p build/ios/ipa/Payload
+          cp -r build/ios/iphoneos/Runner.app build/ios/ipa/Payload/Runner.app
+          cd build/ios/ipa
+          zip -r zendora-unsigned.ipa Payload
+          cd ../../..
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zendora-ios-unsigned
+          path: build/ios/ipa/zendora-unsigned.ipa
+          retention-days: 14
